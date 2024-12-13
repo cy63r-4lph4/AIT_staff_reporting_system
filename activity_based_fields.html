@@ -1,0 +1,24 @@
+<div id="activity_fields" class="report-field">
+  <h2 class="text-xl font-semibold mb-2">Activity Report</h2>
+  <input type="hidden" name="report_type" value="activity" />
+  <div>
+    <label for="name" class="block text-sm font-medium text-gray-700"
+      >Activity:</label
+    >
+    <select
+      id="activity"
+      name="activity"
+      class="border p-2 rounded text-wrap max-w-sm overflow-hidden text-ellipsis border-gray-300 sm:text-sm"
+      required
+      autocomplete="off"
+    >
+      <option value="">Loading...</option>
+    </select>
+  </div>
+  <button
+    type="submit"
+    class="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+  >
+    Generate Activity Report
+  </button>
+</div>

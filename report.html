@@ -1,0 +1,45 @@
+<div class="w-full bg-white lg:p-8 p-2 rounded shadow-md">
+  <div class="text-center text-blue-800 text-2xl font-bold mb-6 lg:text-3xl">
+    Generate Report
+  </div>
+  <form id="genRep" action="FetchReport.php" method="post">
+    <!-- Report Type Selection -->
+    <div class="mb-4">
+      <h2 class="text-xl font-semibold mb-2">Select Report Type</h2>
+      <div class="report_type">
+        <input
+          type="radio"
+          id="activity_base "
+          name="report_type"
+          value="activity"
+        />
+        <label for="weekly" class="ml-2">Activity Report</label>
+      </div>
+      <div class="report_type">
+        <input type="radio" id="weekly" name="report_type" value="weekly" />
+        <label for="weekly" class="ml-2">Weekly Report</label>
+      </div>
+      <div class="report_type">
+        <input type="radio" id="monthly" name="report_type" value="monthly" />
+        <label for="monthly" class="ml-2">Monthly Report</label>
+      </div>
+      <div class="report_type">
+        <input type="radio" id="user" name="report_type" value="user" />
+        <label for="user" class="ml-2">User Report</label>
+      </div>
+    </div>
+
+    <div id="repcontainer"></div>
+  </form>
+  <div class="flex justify-end">
+    <div
+      id="myportal"
+      class="bg-blue-900 text-white px-4 py-2 rounded cursor-poninter"
+    >
+      My Portal
+    </div>
+  </div>
+
+  <div class="h-12"></div>
+  <div id="reportTable" class="h-full overflow-auto"></div>
+</div>
