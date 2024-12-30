@@ -1,6 +1,6 @@
 <div id="activity_fields" class="report-field">
   <h2 class="text-xl font-semibold mb-2">Activity Report</h2>
-  <input type="hidden" name="report_type" value="activity" />
+  <!-- <input type="hidden" name="report_type" value="activity" /> -->
   <div>
     <label for="name" class="block text-sm font-medium text-gray-700"
       >Activity:</label
@@ -8,12 +8,15 @@
     <select
       id="activity"
       name="activity"
-      class="border p-2 rounded text-wrap max-w-sm overflow-hidden text-ellipsis border-gray-300 sm:text-sm"
+      class="border p-2 rounded text-wrap  max-w-64 overflow-hidden text-ellipsis border-gray-300 sm:text-sm"
       required
       autocomplete="off"
     >
       <option value="">Loading...</option>
     </select>
+  </div>
+  <div id="filter" class="flex flex-row">
+    <div id="sel_offcr"></div>
   </div>
   <button
     type="submit"

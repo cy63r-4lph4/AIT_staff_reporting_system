@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Summary</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .chart-canvas {
+      width: 100% !important; /* Make sure the width is responsive */
+      height: 300px !important; /* Fixed height for the canvas */
+      max-width: 100%; /* Prevent stretching */
+    }
+  </style>
+</head>
+<body class="bg-gray-100 p-5">
+  <h1 class="text-2xl font-bold text-gray-700 mb-5">Reports Summary</h1>
+
+  <!-- Container for Charts -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Total Reports Chart -->
+    <div class="bg-white shadow-md rounded p-5">
+      <h2 class="text-lg font-bold text-gray-700 mb-3">Total Reports Submitted</h2>
+      <canvas id="reportChart" class="chart-canvas"></canvas>
+    </div>
+
+    <!-- Activities Chart -->
+    <div class="bg-white shadow-md rounded p-5">
+      <h2 class="text-lg font-bold text-gray-700 mb-3">Reports by Activities</h2>
+      <canvas id="activityChart" class="chart-canvas"></canvas>
+    </div>
+
+    <!-- Monthly Reports Chart -->
+    <div class="bg-white shadow-md rounded p-5">
+      <h2 class="text-lg font-bold text-gray-700 mb-3">Monthly Reports</h2>
+      <canvas id="monthlyChart" class="chart-canvas"></canvas>
+    </div>
+
+    <!-- User Contributions Chart -->
+    <div class="bg-white shadow-md rounded p-5">
+      <h2 class="text-lg font-bold text-gray-700 mb-3">Reports by Users</h2>
+      <canvas id="userChart" class="chart-canvas"></canvas>
+    </div>
+  </div>
+
+  <script src="summary.js"></script>
+</body>
+</html>

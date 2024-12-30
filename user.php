@@ -8,6 +8,7 @@ if (!isset($_SESSION['user'])) {
 } else {
     $id = $_SESSION['user'];
     $act = $_REQUEST['a'] ?? "";
+    $user = $_REQUEST['r'] ?? "";
 
     try {
         if ($act == "getDet") {
@@ -33,7 +34,12 @@ if (!isset($_SESSION['user'])) {
             $stmt = $conn->prepare('SELECT ua.activity_id, a.activity_name FROM useractivity ua JOIN activities a ON ua.activity_id = a.activity_id WHERE ua.email = ?');
 
             if ($stmt) {
+                if ($user != '') {
+                    $stmt->bind_param('s', $user);
+    
+                } else {
                 $stmt->bind_param('s', $id);
+                }
                 $stmt->execute();
                 $result = $stmt->get_result();
 

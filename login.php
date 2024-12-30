@@ -21,7 +21,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             header('location:dashboard.php');
             $_SESSION['role'] = 2;
             exit();
-        } else if ($role == 3) {
+        } 
+       else if ($role == 1) {
+            header('location:profdb.php');
+            $_SESSION['role'] = 1;
+            exit();
+        } 
+        else if ($role == 3) {
 
             header('location:userDashboard.php');
             $_SESSION['role'] = 3;

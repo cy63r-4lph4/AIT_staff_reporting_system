@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const rolesButton = document.getElementById("roles");
   const mainContent = document.getElementById("mainContent");
   const hamIcon = document.getElementById("ham");
+  const dashboardButton=document.getElementById("dashboard");
 
   async function loadContent(page, id = null) {
     return fetch(page)
@@ -1707,26 +1708,353 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error("Error:", error);
       });
   }
-  function fetchNames() {
+  function fetchNames(filter = false, activities = []) {
     fetch("crud.php?action=read&table=users")
       .then((response) => response.json())
       .then((data) => {
-        const select = document.getElementById("name");
+        if (!filter) {
+          const select = document.getElementById("name");
 
-        select.innerHTML = '<option value="">Select a name</option>';
-        if (data.status == "success") {
-          data.data.forEach((item) => {
-            const option = document.createElement("option");
-            option.value = item.email;
-            option.textContent = item.user_name;
-            select.appendChild(option);
+          select.innerHTML = '<option value="">Select a name</option>';
+          if (data.status == "success") {
+            data.data.forEach((item) => {
+              const option = document.createElement("option");
+              option.value = item.email;
+              option.textContent = item.user_name;
+              select.appendChild(option);
+            });
+          }
+          select.addEventListener("change", function () {
+            officer_id = this.value;
+            filter = document.getElementById("filter");
+            filter.textContent='';
+            const act_filter = document.createElement("div");
+            act_filter.classList.add("dyn_filter");
+            const label = document.createElement("label");
+            label.setAttribute("for", "activities");
+            label.textContent = "Officer's Activities";
+
+            label.classList.add(
+              "block",
+              "text-sm",
+              "font-medium",
+              "text-gray-700"
+            );
+            act_filter.appendChild(label);
+            const select = document.createElement("div");
+            select.name = "activity";
+            select.id = "sel_act";
+            select.classList.add("hidden");
+            act_filter.appendChild(select);
+            filter.appendChild(act_filter);
+            label.addEventListener("click", function () {
+              select.classList.toggle("hidden");
+            });
+            const dur_filter = document.createElement("div");
+            dur_filter.classList.add("dyn_filter", "flex", "flex-row", "gap-6");
+            const dur_container1 = document.createElement("div");
+            dur_container1.classList.add("flex", "flex-col", "gap-2");
+            const dur_label1 = document.createElement("label");
+            dur_label1.textContent = "Start Date";
+            const dur_input1 = document.createElement("input");
+            dur_input1.type = "date";
+            dur_container1.appendChild(dur_label1);
+            dur_container1.appendChild(dur_input1);
+            const dur_container2 = document.createElement("div");
+            dur_container2.classList.add("flex", "flex-col", "gap-2");
+            const dur_label2 = document.createElement("label");
+            dur_label2.textContent = "End Date";
+            const dur_input2 = document.createElement("input");
+            dur_input2.type = "date";
+            dur_container2.appendChild(dur_label2);
+            dur_container2.appendChild(dur_input2);
+            dur_filter.appendChild(dur_container1);
+            dur_filter.appendChild(dur_container2);
+            filter.appendChild(dur_filter);
+
+            fetchOfficerAct(officer_id);
           });
+        } else {
+          const select = document.getElementById("sel_offcr");
+          select.innerHTML= "";
+          const offcrs = document.createElement("div");
+          offcrs.id = "offcrs";
+
+          if (data.status === "success") {
+            const AlloffcrsCheckboxWrapper = document.createElement("div");
+            AlloffcrsCheckboxWrapper.className = "checkbox-item";
+
+            const allOfficersCheckbox = document.createElement("input");
+            allOfficersCheckbox.type = "checkbox";
+            allOfficersCheckbox.id = "officers_All";
+            allOfficersCheckbox.value = "all_offcrs";
+            allOfficersCheckbox.name = "officers";
+
+            const allOfficersLabel = document.createElement("label");
+            allOfficersLabel.htmlFor = "officers_All";
+            allOfficersLabel.textContent = "All Officers";
+
+            AlloffcrsCheckboxWrapper.appendChild(allOfficersCheckbox);
+            AlloffcrsCheckboxWrapper.appendChild(allOfficersLabel);
+
+            allOfficersCheckbox.addEventListener("change", function () {
+              const individualCheckboxes = document.querySelectorAll(
+                ".offcrs-item input[type='checkbox']"
+              );
+              if (allOfficersCheckbox.checked) {
+                individualCheckboxes.forEach((checkbox) => {
+                  checkbox.checked = false;
+                  checkbox.disabled = true;
+                });
+                offcrs.classList.add("hidden");
+              } else {
+                individualCheckboxes.forEach((checkbox) => {
+                  checkbox.disabled = false;
+                });
+                offcrs.classList.remove("hidden");
+              }
+            });
+            select.appendChild(AlloffcrsCheckboxWrapper);
+
+            if (activities.length > 0) {
+              data.data.forEach((item) => {
+                const activityids = item.activity_ids.split(",");
+                const hasMatchingActivity = activities.some(
+                  (selectedActivityId) =>
+                    activityids.includes(selectedActivityId)
+                );
+                
+
+                if (hasMatchingActivity) {
+                  const checkboxWrapper = document.createElement("div");
+                  checkboxWrapper.className = "checkbox-item offcrs-item";
+
+                  const checkbox = document.createElement("input");
+                  checkbox.type = "checkbox";
+                  checkbox.id = `officer_${item.email}`;
+                  checkbox.value = item.user_email;
+                  checkbox.name = "officer";
+
+                  const label = document.createElement("label");
+                  label.htmlFor = `officer_${item.email}`;
+                  label.textContent = item.user_name;
+
+                  checkboxWrapper.appendChild(checkbox);
+                  checkboxWrapper.appendChild(label);
+
+                  offcrs.appendChild(checkboxWrapper);
+                }
+              });
+              if(activities.length <= 0) {
+                AlloffcrsCheckboxWrapper.textContent =
+                  "No Officer for the Selected Activity";
+              }
+
+              select.appendChild(offcrs);
+              return;
+            }
+
+            data.data.forEach((item) => {
+              const checkboxWrapper = document.createElement("div");
+              checkboxWrapper.className = "checkbox-item offcrs-item";
+              const checkbox = document.createElement("input");
+              checkbox.type = "checkbox";
+              checkbox.id = `officer_${item.email}`;
+              checkbox.value = item.user_email;
+              checkbox.name = "officer";
+
+              const label = document.createElement("label");
+              label.htmlFor = `officer_${item.email}`;
+              label.textContent = item.user_name;
+
+              checkboxWrapper.appendChild(checkbox);
+              checkboxWrapper.appendChild(label);
+
+              offcrs.appendChild(checkboxWrapper);
+
+              select.appendChild(offcrs);
+            });
+          }
         }
       })
+
       .catch((error) => {
         console.error("Error fetching names:", error);
       });
   }
+  function fetchOfficerAct(officer_id = null) {
+    const select = document.getElementById("sel_act");
+  
+    select.innerHTML = "";
+  
+    if (officer_id) {
+      // Fetch activities for a specific officer
+      fetch(`user.php?a=getActivities&r=${officer_id}`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (!data.error) {
+            const officerActWrapper = document.createElement("div");
+            officerActWrapper.id = "officer_act";
+  
+            // Create "All Activities" checkbox for officer's activities
+            const allActCheckboxWrapper = document.createElement("div");
+            allActCheckboxWrapper.className = "checkbox-item";
+  
+            const allActivitiesCheckbox = document.createElement("input");
+            allActivitiesCheckbox.type = "checkbox";
+            allActivitiesCheckbox.id = "activity_All";
+            allActivitiesCheckbox.value = "all_acts";
+            allActivitiesCheckbox.name = "activities";
+  
+            const allActivitiesLabel = document.createElement("label");
+            allActivitiesLabel.htmlFor = "activity_All";
+            allActivitiesLabel.textContent = "All Activities";
+  
+            allActCheckboxWrapper.appendChild(allActivitiesCheckbox);
+            allActCheckboxWrapper.appendChild(allActivitiesLabel);
+  
+            // Add event listener for "All Activities" checkbox
+            allActivitiesCheckbox.addEventListener("change", function () {
+              const individualCheckboxes = document.querySelectorAll(
+                "#officer_act .checkbox-item input[type='checkbox']"
+              );
+  
+              if (allActivitiesCheckbox.checked) {
+                individualCheckboxes.forEach((checkbox) => {
+                  checkbox.checked = false;
+                  checkbox.disabled = true;
+                });
+                fetchNames(true); 
+              } else {
+                individualCheckboxes.forEach((checkbox) => {
+                  checkbox.disabled = false;
+                });
+              }
+            });
+  
+            select.appendChild(allActCheckboxWrapper);
+  
+            // Generate checkboxes for the officer's activities
+            data.forEach((item) => {
+              const checkboxWrapper = document.createElement("div");
+              checkboxWrapper.className = "checkbox-item";
+  
+              const checkbox = document.createElement("input");
+              checkbox.type = "checkbox";
+              checkbox.id = `activity_${item.activity_id}`;
+              checkbox.value = item.activity_id;
+              checkbox.name = "activities";
+  
+              const label = document.createElement("label");
+              label.htmlFor = `activity_${item.activity_id}`;
+              label.textContent = item.activity_name;
+  
+              checkboxWrapper.appendChild(checkbox);
+              checkboxWrapper.appendChild(label);
+  
+              officerActWrapper.appendChild(checkboxWrapper);
+  
+              // Add event listener for individual checkboxes
+              checkbox.addEventListener("change", function () {
+                const selectedActivities = Array.from(
+                  document.querySelectorAll("#officer_act .checkbox-item input[type='checkbox']:checked")
+                ).map((checkbox) => checkbox.value);
+  
+                fetchNames(true, selectedActivities);
+              });
+            });
+  
+            select.appendChild(officerActWrapper);
+          }
+        })
+        .catch((error) => console.error("Error fetching officer activities:", error));
+    } else {
+      // Fetch all activities if no officer is selected
+      fetch("crud.php?action=read&table=activities")
+        .then((response) => response.json())
+        .then((data) => {
+          const acts = document.createElement("div");
+          acts.id = "act";
+  
+          if (data.status === "success") {
+            // Create "All Activities" checkbox
+            const allActCheckboxWrapper = document.createElement("div");
+            allActCheckboxWrapper.className = "checkbox-item";
+  
+            const allActivitiesCheckbox = document.createElement("input");
+            allActivitiesCheckbox.type = "checkbox";
+            allActivitiesCheckbox.id = "activity_All";
+            allActivitiesCheckbox.value = "all_acts";
+            allActivitiesCheckbox.name = "activities";
+  
+            const allActivitiesLabel = document.createElement("label");
+            allActivitiesLabel.htmlFor = "activity_All";
+            allActivitiesLabel.textContent = "All Activities";
+  
+            allActCheckboxWrapper.appendChild(allActivitiesCheckbox);
+            allActCheckboxWrapper.appendChild(allActivitiesLabel);
+  
+            allActivitiesCheckbox.addEventListener("change", function () {
+              const individualCheckboxes = document.querySelectorAll(".act-item input[type='checkbox']");
+  
+              if (allActivitiesCheckbox.checked) {
+                individualCheckboxes.forEach((checkbox) => {
+                  checkbox.checked = false;
+                  checkbox.disabled = true;
+                  acts.classList.add("hidden");
+                  fetchNames(true);
+                });
+              } else {
+                individualCheckboxes.forEach((checkbox) => {
+                  checkbox.disabled = false;
+                  acts.classList.remove("hidden");
+                });
+              }
+            });
+  
+            select.appendChild(allActCheckboxWrapper);
+  
+            // Generate checkboxes for each activity
+            if (data.data.length > 0) {
+              data.data.forEach((item) => {
+                const checkboxWrapper = document.createElement("div");
+                checkboxWrapper.className = "checkbox-item act-item";
+  
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.id = `activity_${item.activity_id}`;
+                checkbox.value = item.activity_id;
+                checkbox.name = "activities";
+  
+                const label = document.createElement("label");
+                label.htmlFor = `activity_${item.activity_id}`;
+                label.textContent = item.activity_name;
+  
+                checkboxWrapper.appendChild(checkbox);
+                checkboxWrapper.appendChild(label);
+  
+                acts.appendChild(checkboxWrapper);
+                select.appendChild(acts);
+  
+                checkbox.addEventListener("change", function () {
+                  const selectedActivities = Array.from(
+                    document.querySelectorAll(".act-item input[type='checkbox']:checked")
+                  ).map((checkbox) => checkbox.value);
+  
+                  fetchNames(true, selectedActivities);
+                });
+              });
+            } else {
+              // Display message if no activities are available
+              allActCheckboxWrapper.textContent = "No Activities Available";
+            }
+          }
+        })
+        .catch((error) => console.error("Error fetching all activities:", error));
+    }
+  }
+  
+  
   function fetchActivities() {
     fetch("crud.php?action=read&table=activities")
       .then((response) => response.json())
@@ -1741,6 +2069,9 @@ document.addEventListener("DOMContentLoaded", function () {
             option.textContent = item.activity_name;
             select.appendChild(option);
           });
+          select.addEventListener("change",function(){
+            fetchNames(true);
+          })
         }
       })
       .catch((error) => {
@@ -1974,6 +2305,7 @@ document.addEventListener("DOMContentLoaded", function () {
       sideMenu.classList.remove("w-1/4");
     }
   }
+if (usersButton != null){
 
   usersButton.addEventListener("click", function (e) {
     e.preventDefault();
@@ -1983,19 +2315,26 @@ document.addEventListener("DOMContentLoaded", function () {
     setActive(this);
     fetchdata("users");
   });
+}
+  if (activitiesButton !=null){
+    activitiesButton.addEventListener("click", function (e) {
+      e.preventDefault();
+      mainContent.innerHTML = "";
+      loadContent("activities.html");
+      setActive(this);
+    });
+  }
 
-  activitiesButton.addEventListener("click", function (e) {
-    e.preventDefault();
-    mainContent.innerHTML = "";
-    loadContent("activities.html");
-    setActive(this);
-  });
-
+  
+if (reportButton !=null){
   reportButton.addEventListener("click", function (e) {
     e.preventDefault();
     loadContent("report.html");
     setActive(this);
   });
+  
+}
+ if (tasksButton !=null){
   tasksButton.addEventListener("click", function (e) {
     mainContent.innerHTML = "";
 
@@ -2003,12 +2342,16 @@ document.addEventListener("DOMContentLoaded", function () {
     loadContent("tasks.html");
     setActive(this);
   });
-  rolesButton.addEventListener("click", function (e) {
-    e.preventDefault();
-    mainContent.innerHTML = "";
-    loadContent("roles.html");
-    setActive(this);
-  });
+ } 
+  if (rolesButton !=null){
+    rolesButton.addEventListener("click", function (e) {
+      e.preventDefault();
+      mainContent.innerHTML = "";
+      loadContent("roles.html");
+      setActive(this);
+    });
+  }
+  
   chpasswdButton.addEventListener("click", function (e) {
     e.preventDefault();
     mainContent.innerHTML = "";
@@ -2043,5 +2386,21 @@ document.addEventListener("DOMContentLoaded", function () {
     showMenu(menu_icon);
   });
 
-  loadContent("users.html");
+  if(dashboardButton !=null){
+    dashboardButton.addEventListener("click", function (e) {
+      e.preventDefault();
+      loadContent("dashboard.html");
+      setActive(this);
+     fetchSummarry();
+    });
+    loadContent("dashboard.html");
+    fetchSummarry();
+   
+      
+
+  }
+  else{
+    loadContent("users.html");
+
+  }
 });
