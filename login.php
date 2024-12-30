@@ -18,21 +18,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (password_verify($passwd, $hashed_passwd)) {
         $_SESSION['user'] = $email;
         if ($role == 2) {
-            header('location:dashboard.php');
             $_SESSION['role'] = 2;
-            exit();
+        
         } 
        else if ($role == 1) {
-            header('location:profdb.php');
+            
             $_SESSION['role'] = 1;
-            exit();
+          
         } 
         else if ($role == 3) {
 
-            header('location:userDashboard.php');
             $_SESSION['role'] = 3;
-            exit();
+            
         }
+        header('location:homepage.php');
+    
     } else {
         $_SESSION['error'] = "Invalid Credentials";
         header('Location: login.php');

@@ -1,3 +1,2 @@
 <?php
-header('location: userDashboard.php');
-exit();
+header("location:homepage.php");
